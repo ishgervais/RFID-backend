@@ -4,8 +4,8 @@
   "description": "Transacting with RFID",
   "main": "index.js",
   "scripts": {
-    "serve": "nodemon server/index.js",
-    "start": "node server/index.js",
+    "serve": "nodemon index.js",
+    "start": "node index.js",
     "dev": "SET debug=* && npm serve"
   },
   "author": "Munezero Didier",
