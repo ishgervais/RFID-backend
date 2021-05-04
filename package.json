@@ -8,7 +8,7 @@
     "start": "node index.js",
     "dev": "SET debug=* && npm serve"
   },
-  "author": "Munezero Didier",
+  "author": "Gervais",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.19.0",
