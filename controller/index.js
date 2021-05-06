@@ -5,8 +5,20 @@ exports.getAllTransactions = async(req, res) =>{
     return res.send(transactions).status(200);
 }
 exports.AllCards = async(req, res) =>{
+    try{
     const cards = await RFID.find({});
     return res.send(cards);
+    }catch(e){
+        return res.send({message:e.message}).status(400);
+    }
+}
+exports.loadAllCards = async(req, res) =>{
+    try{
+    const cards = await RFID.find({});
+    return cards;
+    }catch(e){
+        return res.send({message:e.message}).status(400);
+    }
 }
 exports.checkCard = async(req, res) =>{
     const card = await RFID.find({uuid:req.params.uuid});
@@ -44,7 +56,8 @@ exports.newTransaction = async(req, res)=>{
 }
 
 exports.newCard = async(req, res) =>{
-    console.log(req.body);
+  
+    try{
     const no_card = await RFID.findOne({uuid: req.body.uuid});
     if(no_card){
         return res.send({message: 'RFID already exists, can not be duplicated'}).status(400);
@@ -61,5 +74,9 @@ exports.newCard = async(req, res) =>{
         owner: req.body.owner,
     })
     const saved = await card.save();
+    console.log(saved);
     return res.send(saved).status(200);
+}catch(e){
+    return res.send({message:e.message}).status(400);
+}
 }

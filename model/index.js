@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const RFID_Schema = new mongoose.Schema(
   {
-    uuid: {
+    uuid: { 
         type: String,
         required: true,
         unique: true,
     },
     Owner: {
       type: String,
+      required:false
     },
     current_balance: {
       type: Number,
