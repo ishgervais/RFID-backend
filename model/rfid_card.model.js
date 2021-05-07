@@ -37,14 +37,21 @@ const Transaction_Schema = new mongoose.Schema(
     },
     {
       toJSON:{
-        virtual:true
+        virtuals:true
       },
-      toVirtuals:{
-        virtual:true
+      toVirtual:{
+        virtuals:true
       }
     }
   );
 
+  Transaction_Schema.virtual("transactions",{
+    ref:"RFID",
+    localField:"card_id",
+    foreignField:"_id",
+    justOne:false
+});
+
 
   exports.RFID = mongoose.model("RFID", RFID_Schema);
-exports.Transactions = mongoose.model("Transaction", Transaction_Schema);
+exports.Transaction = mongoose.model("Transaction", Transaction_Schema);

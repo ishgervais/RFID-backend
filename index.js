@@ -5,7 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const socketIo = require('socket.io');
 const app = express();
-const {loadAllCards} = require("./controller/rfid_card.controller")
+const {loadAllCards,getAllTransactions} = require("./controller/rfid_card.controller")
 
 dotenv.config();
 app.use(cors());
@@ -66,6 +66,9 @@ const getApiAndEmit = async (socket) => {
   let response = await loadAllCards();
   // Emitting a new message. Will be consumed by the client
   socket.emit("Cards", response || []);
+
+  let responseTrans = await getAllTransactions();
+  socket.emit("Transactions", responseTrans || []);
 };
 
 

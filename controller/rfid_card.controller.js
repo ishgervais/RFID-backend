@@ -1,10 +1,11 @@
-const {RFID,Transactions}  = require('../model/rfid_card.model')
+const {RFID,Transaction}  = require('../model/rfid_card.model')
 
 exports.getAllTransactions = async(req, res) =>{
     try{
-        const transactions = await Transactions.find().populate("transactions");
+        const transactions = await Transaction.find().populate("transactions");
         if(!transactions){return res.send({message:'Transactions not found'}).status(400)}
-        return res.send(transactions).status(200);
+        // return res.send(transactions).status(200);
+        return transactions;
     }catch(e){return res.send({message:e.message}).status(400)}
    
 }
@@ -38,26 +39,30 @@ exports.getRFIDTransactions = async(req, res) =>{
 
 exports.newTransaction = async(req, res)=>{
     try{
-    const rfid = await RFID.findOne({uuid:req.body.rfid});
+      
+    const rfid = await RFID.findOne({uuid:req.body.uuid});
     if(!rfid){
         return res.status(404).send({message: 'RFID not found'})
     }
     if(!req.body.transaction_fare){
-        return res.status(400).send({message: 'Transaction fare required'})
+        return res.status(404).send({message: 'Transaction fare required'})
     }
     if(rfid.current_balance < req.body.transaction_fare){
-        return res.status(400).send({message: 'Insufficient balance'});
+        return res.status(404).send({message: 'Insufficient balance'});
     }
-    rfid.current_balance = rfid.current_balance - parseInt(req.body.transaction_fare);
+    if(req.body.type === 'deposit'){
+        rfid.current_balance = rfid.current_balance + parseInt(req.body.transaction_fare); 
+    }else  rfid.current_balance = rfid.current_balance - parseInt(req.body.transaction_fare);
+
     const updated = await rfid.save();
     const transaction = new Transactions({
         card_id: updated._id,
-        transaction_fare: parseInt(req.body.transaction_fare),
-        new_balance: updated.current_balance,
+        transactions_fare: parseInt(req.body.transaction_fare),
+        new_balance: rfid.current_balance,
     })
 
     const saved = await transaction.save();
-
+    console.log(saved)
     return res.status(200).send({saved});
 
 }catch(e){return res.send({message:e.message}).status(400)}
@@ -82,7 +87,6 @@ exports.newCard = async(req, res) =>{
         owner: req.body.owner,
     })
     const saved = await card.save();
-    console.log(saved);
     return res.send(saved).status(200);
 }catch(e){
     return res.send({message:e.message}).status(400);
