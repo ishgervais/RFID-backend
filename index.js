@@ -5,7 +5,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const socketIo = require('socket.io');
 const app = express();
-const {loadAllCards} = require("./controller/index")
+const {loadAllCards} = require("./controller/rfid_card.controller")
 
 dotenv.config();
 app.use(cors());
@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 
-require("./router")(app);
+require("./router/rfid_card.routes")(app);
 const mongoose = require("mongoose");
 
 const server = http.createServer(app);

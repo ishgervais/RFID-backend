@@ -1,8 +1,12 @@
-const {RFID,Transactions}  = require('../model')
+const {RFID,Transactions}  = require('../model/rfid_card.model')
 
 exports.getAllTransactions = async(req, res) =>{
-    const transactions = await Transactions.find({})
-    return res.send(transactions).status(200);
+    try{
+        const transactions = await Transactions.find().populate("transactions");
+        if(!transactions){return res.send({message:'Transactions not found'}).status(400)}
+        return res.send(transactions).status(200);
+    }catch(e){return res.send({message:e.message}).status(400)}
+   
 }
 exports.AllCards = async(req, res) =>{
     try{
@@ -31,7 +35,9 @@ exports.getRFIDTransactions = async(req, res) =>{
     const transactions = await Transactions.find({card_id:req.params.uuid});
     return res.send(transactions).status(200);
 }
+
 exports.newTransaction = async(req, res)=>{
+    try{
     const rfid = await RFID.findOne({uuid:req.body.rfid});
     if(!rfid){
         return res.status(404).send({message: 'RFID not found'})
@@ -40,12 +46,12 @@ exports.newTransaction = async(req, res)=>{
         return res.status(400).send({message: 'Transaction fare required'})
     }
     if(rfid.current_balance < req.body.transaction_fare){
-        return res.status(400).send({message: 'Transaction fare is greater that card amount'});
+        return res.status(400).send({message: 'Insufficient balance'});
     }
     rfid.current_balance = rfid.current_balance - parseInt(req.body.transaction_fare);
     const updated = await rfid.save();
     const transaction = new Transactions({
-        card_id: updated.uuid,
+        card_id: updated._id,
         transaction_fare: parseInt(req.body.transaction_fare),
         new_balance: updated.current_balance,
     })
@@ -53,6 +59,8 @@ exports.newTransaction = async(req, res)=>{
     const saved = await transaction.save();
 
     return res.status(200).send({saved});
+
+}catch(e){return res.send({message:e.message}).status(400)}
 }
 
 exports.newCard = async(req, res) =>{

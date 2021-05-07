@@ -19,9 +19,9 @@ const RFID_Schema = new mongoose.Schema(
 const Transaction_Schema = new mongoose.Schema(
     {
       card_id: {
-          type: String,
-          required: true,
+          type: mongoose.Schema.ObjectId,
           ref:"RFID",
+          required: true,
       },
       transactions_fare: {
         type: Number,
@@ -34,7 +34,17 @@ const Transaction_Schema = new mongoose.Schema(
     },
     {
         timestamps: true,
+    },
+    {
+      toJSON:{
+        virtual:true
+      },
+      toVirtuals:{
+        virtual:true
+      }
     }
   );
+
+
   exports.RFID = mongoose.model("RFID", RFID_Schema);
 exports.Transactions = mongoose.model("Transaction", Transaction_Schema);

@@ -1,4 +1,4 @@
-const controllers = require('../controller')
+const controllers = require('../controller/rfid_card.controller')
 module.exports = (app) => {
   app.get("/api/cards", controllers.AllCards);
   app.get("/api/cards/:uuid", controllers.checkCard);
