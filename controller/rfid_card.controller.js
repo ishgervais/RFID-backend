@@ -47,7 +47,7 @@ exports.newTransaction = async(req, res)=>{
     if(!req.body.transaction_fare){
         return res.status(404).send({message: 'Transaction fare required'})
     }
-    if(rfid.current_balance < req.body.transaction_fare){
+    if(req.body.type != 'deposit' && (rfid.current_balance < req.body.transaction_fare)){
         return res.status(404).send({message: 'Insufficient balance'});
     }
     if(req.body.type === 'deposit'){
@@ -55,13 +55,11 @@ exports.newTransaction = async(req, res)=>{
     }else  rfid.current_balance = rfid.current_balance - parseInt(req.body.transaction_fare);
 
     const updated = await rfid.save();
-    console.log('hello',updated)
         const transaction = new Transaction({
             card_id: updated._id,
             transactions_fare: parseInt(req.body.transaction_fare),
             new_balance: updated.current_balance,
         })
-        console.log('hii',transaction)
     
     
     const saved = await transaction.save();
