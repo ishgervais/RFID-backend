@@ -2,7 +2,7 @@ const {RFID,Transaction}  = require('../model/rfid_card.model')
 
 exports.getAllTransactions = async(req, res) =>{
     try{
-        const transactions = await Transaction.find().populate("transactions");
+        const transactions = await Transaction.find({}).populate("transactions");
         if(!transactions){return res.send({message:'Transactions not found'}).status(400)}
         // return res.send(transactions).status(200);
         return transactions;
@@ -33,7 +33,7 @@ exports.checkCard = async(req, res) =>{
     return res.send({success:false});
 }
 exports.getRFIDTransactions = async(req, res) =>{
-    const transactions = await Transactions.find({card_id:req.params.uuid});
+    const transactions = await Transaction.find({card_id:req.params.uuid});
     return res.send(transactions).status(200);
 }
 
@@ -55,12 +55,15 @@ exports.newTransaction = async(req, res)=>{
     }else  rfid.current_balance = rfid.current_balance - parseInt(req.body.transaction_fare);
 
     const updated = await rfid.save();
-    const transaction = new Transactions({
-        card_id: updated._id,
-        transactions_fare: parseInt(req.body.transaction_fare),
-        new_balance: rfid.current_balance,
-    })
-
+    console.log('hello',updated)
+        const transaction = new Transaction({
+            card_id: updated._id,
+            transactions_fare: parseInt(req.body.transaction_fare),
+            new_balance: updated.current_balance,
+        })
+        console.log('hii',transaction)
+    
+    
     const saved = await transaction.save();
     console.log(saved)
     return res.status(200).send({saved});

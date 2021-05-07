@@ -50,15 +50,23 @@ const io = socketIo(server, {
   },
 });
 let interval;
+let intervalOne;
 io.on("connection", (socket) => {
   console.log("New client connected");
+  if (intervalOne) {
+    clearInterval(intervalOne);
+  }
   if (interval) {
     clearInterval(interval);
   }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  intervalOne = setInterval(() => getApiAndEmit(socket), 1000);
+  interval = setInterval(() => getApiLogs(socket), 1000);
+
+  
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     clearInterval(interval);
+    clearInterval(intervalOne);
   });
 });
 
@@ -66,11 +74,13 @@ const getApiAndEmit = async (socket) => {
   let response = await loadAllCards();
   // Emitting a new message. Will be consumed by the client
   socket.emit("Cards", response || []);
-
-  let responseTrans = await getAllTransactions();
-  socket.emit("Transactions", responseTrans || []);
 };
 
+const getApiLogs = async(socket) => {
+  let responseTrans = await getAllTransactions();
+  // console.log("emit transactions")
+  socket.emit("Transactions", responseTrans || []);
+}
 
 //  socket io ends here
 
