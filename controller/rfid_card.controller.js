@@ -59,6 +59,7 @@ exports.newTransaction = async(req, res)=>{
             card_id: updated._id,
             transactions_fare: parseInt(req.body.transaction_fare),
             new_balance: updated.current_balance,
+            transaction_type:req.body.type
         })
     
     

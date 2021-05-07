@@ -29,6 +29,10 @@ const Transaction_Schema = new mongoose.Schema(
       new_balance: {
         type: Number,
         required: true
+      },
+      transaction_type:{
+        type:String,
+        required:true
       }
     },
     {
